@@ -16,6 +16,6 @@ const server = app.listen(port,()=> {
 })
 
 process.on('unhandledRejection',err => {
-    log(err.name, err.message)
+    log(err.name, err.message,err.stack)
     log("Unhandled Rejection ERROR")
 })
