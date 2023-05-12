@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema({
         type:Number,
         default:0
     },
-    login_disabled_timetamp:Date
+    login_disabled_timestamp:Date
 })
 
 const User = mongoose.model('User',userSchema)
