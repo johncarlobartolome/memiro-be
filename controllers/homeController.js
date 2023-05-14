@@ -1,3 +1,3 @@
-exports.getHomePage = (req,res,next) => {
-   return res.send("Hello, World!")
-}
+exports.getHomePage = (req, res, next) => {
+  return res.send("Hello, World!");
+};

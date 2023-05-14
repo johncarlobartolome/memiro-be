@@ -1,18 +1,29 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
+const runValidators = require('mongoose-unique-validator')
+
 const { log } = require("console");
 const userSchema = new mongoose.Schema({
   email: {
     type: String,
+    unique: true,
     required: [true, "Please provide an email address"],
     validate: [validator.isEmail, "Please provide a valid email address"],
   },
   phone: {
     type: String,
     required: [true, "Please provide a mobile number"],
+    validate: {
+      validator: function (val) {
+        if (val.startsWith("09") && val.length === 11) {
+          return true;
+        } else return false;
+      },
+      message: "Invalid phone number",
+    },
+    unique: true,
   },
-  userName: String,
   firstName: {
     type: String,
     maxLength: [100, "A name should not exceed 100 characters"],
@@ -23,6 +34,7 @@ const userSchema = new mongoose.Schema({
     maxLength: [100, "The last name should not exceed 100 characters"],
     required: [true, "Please fill in Last Name"],
   },
+  userName: { type: String, unique: true },
   birthdate: {
     type: Date,
     required: [true, "Please provide complete birth date"],
@@ -35,6 +47,17 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     minLength: [6, "Password should be at least 6 characters"],
+    select: false,
+  },
+  confirmPassword: {
+    type: String,
+    required: [true, "Please confirm password"],
+    validate: {
+      validator: function (val) {
+        return val === this.password;
+      },
+      message: "Password does not match!",
+    },
   },
   status: {
     type: String,
@@ -48,37 +71,25 @@ const userSchema = new mongoose.Schema({
   login_disabled_timestamp: Date,
 });
 
-const hashData = async (data) => {
-  return bcrypt.hash(data, 12);
-};
+userSchema.plugin(runValidators)
 
 userSchema.pre("save", async function (next) {
-  try {
-    if (this.isModified("email") || this.isNew) {
-      this.email = await hashData(this.email);
-    }
-    if (this.isModified("phone") || this.isNew) {
-      this.phone = await hashData(this.phone);
-    }
-    if (this.isModified("firstName") || this.isNew) {
-      this.firstName = await hashData(this.firstName);
-    }
-    if (this.isModified("lastName") || this.isNew) {
-      this.lastName = await hashData(this.lastName);
-    }
-
-    if (this.isModified("password") || this.isNew) {
-      this.password = await hashData(this.password);
-    }
-
-    if (this.isModified("userName") || this.isNew) {
-      this.userName = (this.firstName + this.lastName).toLowerCase();
-      this.username = await hashData(this.username);
-    }
+  if (this.isNew) {
+    this.userName = (this.firstName + this.lastName).toLowerCase();
+    this.userName = await bcrypt.hash(this.userName, 12);
     next();
-  } catch (error) {}
+  }
+  next();
 });
 
+userSchema.pre("save", async function (next) {
+  if (this.isModified("password") || this.isNew) {
+    this.password = await bcrypt.hash(`${this.password}`, 12);
+    this.confirmPassword = undefined;
+    next();
+  }
+  next();
+});
 const User = mongoose.model("User", userSchema);
 
 module.exports = User;

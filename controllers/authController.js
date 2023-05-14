@@ -1,44 +1,46 @@
 const { log } = require("console");
 const User = require("./../models/userModel");
+const catchAsync = require("../utils/catchAsync");
+const AppError = require("../utils/appError");
 
-exports.signUp = async (req, res) => {
-  try {
-    const {
-      email,
-      phone,
-      firstName,
-      lastName,
-      birthdate,
-      gender,
-      password,
-      status,
-      confirmPassword,
-    } = req.body;
+exports.signUp = catchAsync(async (req, res, next) => {
+  const {
+    email,
+    phone,
+    firstName,
+    lastName,
+    birthdate,
+    gender,
+    password,
+    status,
+    confirmPassword,
+  } = req.body;
 
-    if (password !== confirmPassword) {
-      throw new Error("Password does not match");
+  const checkUser = (candidateLastName) => {
+    if (candidateLastName === lastName) {
+      return next(
+        new AppError(`This user already exist: ${firstName} ${lastName}!`, 400)
+      );
     }
+  };
 
-    if (phone.startsWith("09") && phone.length === 11) {
-      const newUser = await User.create({
-        email,
-        phone,
-        firstName,
-        lastName,
-        birthdate,
-        gender,
-        password,
-        status,
-      });
-
-      return res
-        .status(201)
-        .json({ status: "success", data: { user: newUser } });
-    } else {
-      throw new Error("Invalid phone number");
-    }
-  } catch (error) {
-    log(error);
-    return res.send(error);
+  log("stillhere");
+  const allUsers = await User.find({ firstName });
+  if (allUsers) {
+    Object.values(allUsers).map((el) => checkUser(el.lastName));
+    Object.values(allUsers).map((el) => log(el.phone));
   }
-};
+  const newUser = await User.create({
+    email,
+    phone,
+    firstName,
+    lastName,
+    birthdate,
+    gender,
+    password,
+    confirmPassword,
+    status,
+  });
+
+  return res.status(201).json({ status: "success", data: { user: newUser } });
+});
