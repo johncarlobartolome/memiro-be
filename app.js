@@ -10,7 +10,8 @@ app.use(express.json())
 
 //HOMEPAGE ROUTE
 app.use('/',homeRoute)
-app.use('/users',userRoute)
+//USER ROUTE SIGNUP/LOGIN/ACCOUNT VERIFICATION
+app.use('/',userRoute)
 app.all('*',(req,res,next)=>{
     const error = new Error(`Can't find ${req.originalUrl} in this Server!`)
     error.statusCode = 404

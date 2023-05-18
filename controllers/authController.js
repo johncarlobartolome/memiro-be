@@ -16,23 +16,22 @@ exports.signUp = catchAsync(async (req, res, next) => {
     confirmPassword,
   } = req.body;
 
+/////FOR CHECKING IF USER IS ALREADY TAKEN
+
   const checkUser = (candidateLastName) => {
     if (candidateLastName === lastName) {
       return next(
-        new AppError(`This user already exist: ${firstName} ${lastName}!`, 400)
+        new AppError(`This user already exist`, 400)
       );
     }
   };
 
-  log("stillhere");
   const allUsers = await User.find({ firstName });
   if (allUsers) {
     Object.values(allUsers).map((el) => checkUser(el.lastName));
-    Object.values(allUsers).map((el) => log(el.phone));
   }
   const newUser = await User.create({
     email,
-    phone,
     firstName,
     lastName,
     birthdate,
