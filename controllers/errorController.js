@@ -37,7 +37,7 @@ const sendErrorProd = (err, res) => {
 };
 
 module.exports = (err, req, res, next) => {
-  log(err.code, err.name, err.stack, err.message);
+  log(err.name, err.stack, err.message);
   (err.status = err.status || "error"),
     (err.statusCode = err.statusCode || 500);
   if (process.env.NODE_ENV === "development") {

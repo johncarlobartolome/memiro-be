@@ -16,20 +16,6 @@ exports.signUp = catchAsync(async (req, res, next) => {
     confirmPassword,
   } = req.body;
 
-/////FOR CHECKING IF USER IS ALREADY TAKEN
-
-  const checkUser = (candidateLastName) => {
-    if (candidateLastName === lastName) {
-      return next(
-        new AppError(`This user already exist`, 400)
-      );
-    }
-  };
-
-  const allUsers = await User.find({ firstName });
-  if (allUsers) {
-    Object.values(allUsers).map((el) => checkUser(el.lastName));
-  }
   const newUser = await User.create({
     email,
     firstName,

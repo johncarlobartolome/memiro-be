@@ -65,6 +65,7 @@ const userSchema = new mongoose.Schema(
     date_email_verified: {
       type: Date,
       timestamp: true,
+      default:null
     },
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
@@ -72,20 +73,7 @@ const userSchema = new mongoose.Schema(
 
 userSchema.plugin(runValidators);
 
-// userSchema.pre("save", async function (next) {
-//   if (this.isNew) {
-//     this.userName = (this.firstName + this.lastName).toLowerCase();
-//     this.userName = await bcrypt.hash(this.userName, 12);
-//     next();
-//   }
-//   next();
-// });
 
-// userSchema.pre("save", function (next) {
-//   this.age = new Date.now().getTime() - this.birthdate.getTime();
-//   log("here sAVE", this.age);
-//   next();
-// });
 
 //Validate Age
 userSchema.pre("save", async function (next) {
@@ -100,7 +88,7 @@ userSchema.pre("save", async function (next) {
       : 0;
   const age = year_difference - one_or_zero;
   log(age);
-  if (age <= 13) {
+  if (age < 13) {
     return next(
       new AppError(
         `You must be at least 14 years old to create an account!`,
