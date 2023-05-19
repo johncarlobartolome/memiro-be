@@ -3,7 +3,6 @@ const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const runValidators = require("mongoose-unique-validator");
 
-const { log } = require("console");
 const { Timestamp } = require("bson");
 const AppError = require("../utils/appError");
 const userSchema = new mongoose.Schema(
@@ -87,11 +86,10 @@ userSchema.pre("save", async function (next) {
       ? 1
       : 0;
   const age = year_difference - one_or_zero;
-  log(age);
   if (age < 13) {
     return next(
       new AppError(
-        `You must be at least 14 years old to create an account!`,
+        `You must be at least 13 years old to create an account!`,
         400
       ),
       400
