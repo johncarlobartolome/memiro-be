@@ -2,7 +2,8 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const runValidators = require("mongoose-unique-validator");
-
+const crypto = require("crypto");
+const { log } = require("console");
 const { Timestamp } = require("bson");
 const AppError = require("../utils/appError");
 const userSchema = new mongoose.Schema(
@@ -56,23 +57,23 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    login_disabled_timestamp: { type: Date, timestamp: true },
-    email_verified: {
+    loginDisabledTimestamp: { type: Date, timestamp: true },
+    emailVerified: {
       type: Boolean,
       default: false,
     },
-    date_email_verified: {
+    emailVerificationToken: String,
+    emailVerificationTokenExpiresIn: Date,
+    dateEmailVerified: {
       type: Date,
       timestamp: true,
-      default:null
+      default: null,
     },
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
 userSchema.plugin(runValidators);
-
-
 
 //Validate Age
 userSchema.pre("save", async function (next) {
@@ -107,6 +108,25 @@ userSchema.pre("save", async function (next) {
   }
   next();
 });
+
+userSchema.methods.createEmailVerificationToken = function () {
+  const randomEmailVerificationToken = crypto.randomBytes(4).toString("hex");
+  this.emailVerificationToken = crypto
+    .createHash("sha256")
+    .update(randomEmailVerificationToken)
+    .digest("hex");
+  this.emailVerificationTokenExpiresIn = Date.now() + 10 * 60 * 1000;
+  return randomEmailVerificationToken;
+};
+
+
+userSchema.methods.updateUserVerificationStatus = function(){
+  this.emailVerified = true
+  this.dateEmailVerified = Date.now()
+  this.emailVerificationToken = undefined
+  this.emailVerificationTokenExpiresIn = undefined
+  return this
+}
 const User = mongoose.model("User", userSchema);
 
 module.exports = User;

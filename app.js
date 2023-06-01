@@ -15,7 +15,7 @@ app.use('/',userRoute)
 app.all('*',(req,res,next)=>{
     const error = new Error(`Can't find ${req.originalUrl} in this Server!`)
     error.statusCode = 404
-    return next(new AppError(error.message,error.statusCode))
+    return next(new AppError(error.message,error.statusCode))   
 })
 app.use(globalErrorController)
 
