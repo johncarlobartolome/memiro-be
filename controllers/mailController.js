@@ -1,13 +1,13 @@
 const User = require("../models/userModel");
 const fs = require("fs");
 const nodemailer = require("nodemailer");
-const crypto = require('crypto');
+const crypto = require("crypto");
 const AppError = require("../utils/appError");
 const { log } = require("console");
 
-exports.sendVerificationEmail = async (email,token) => {
+exports.sendVerificationEmail = async (email, token) => {
   //templating html
-  const user = await User.findOne({email:email})
+  const user = await User.findOne({ email: email });
   let verifyHtmlTemplate = fs.readFileSync(
     `${__dirname}/../public/verifyEmailTemplate.html`,
     "utf-8"
@@ -18,9 +18,7 @@ exports.sendVerificationEmail = async (email,token) => {
   );
 
   let transporter = nodemailer.createTransport({
-    host: process.env.MAIL_HOST,
-    port: process.env.MAIL_PORT,
-    secure: false, // true for 465, false for other ports
+    service: process.env.MAIL_SERVICE, // true for 465, false for other ports
     auth: {
       user: process.env.MAIL_USERNAME, // generated ethereal user
       pass: process.env.MAIL_PASSWORD, // generated ethereal password
@@ -38,8 +36,8 @@ exports.sendVerificationEmail = async (email,token) => {
   });
 
   await transporter.sendMail({
-    from: '"MEMIRO" <memiro@memiro.io>', // sender address
-    to: `"${email}"`, // list of receivers
+    from: `"MEMIRO" <${process.env.MAIL_USERNAME}>`, // sender address
+    to: `${email}`, // list of receivers
     subject: "Email Verification", // Subject line
     text: "Hello world?", // plain text body
     html: `${verifyHtmlTemplate}`, // html body
