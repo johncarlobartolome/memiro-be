@@ -29,7 +29,8 @@ exports.signUp = catchAsync(async (req, res, next) => {
     status,
   });
 
-  return res.status(201).json({ status: "success", data: { user: newUser } });
+  // return res.status(201).json({ status: "success", data: { user: newUser } });
+  next();
 });
 
 exports.sendVerificationCode = catchAsync(async (req, res, next) => {
@@ -41,6 +42,13 @@ exports.sendVerificationCode = catchAsync(async (req, res, next) => {
   if (!user) {
     return next(new AppError(`Invalid email. Please try another`, 404));
   }
+
+  const myemailId = email;
+  var maskId = myemailId.replace(
+    /^(.)(.*)(.@.*)$/,
+    (_, a, b, c) => a + b.replace(/./g, "*") + c
+  );
+
   if (user.emailVerified) {
     return next(
       new AppError(
@@ -49,13 +57,14 @@ exports.sendVerificationCode = catchAsync(async (req, res, next) => {
       )
     );
   }
+
   const emailVerificationToken = user.createEmailVerificationToken();
   await user.save({ validateBeforeSave: false });
   sendVerificationEmail(email, emailVerificationToken);
 
   return res.status(200).json({
     status: "success",
-    message: "A verification code is sent to your email",
+    message: `We have sent a verification email to ${maskId}. You need to  verify your email address in order to login to memiro`,
   });
 });
 

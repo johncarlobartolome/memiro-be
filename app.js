@@ -20,5 +20,11 @@ app.all('*',(req,res,next)=>{
 app.use(globalErrorController)
 
 if(process.env.NODE_ENV === 'development')app.use(morgan('dev'))
+const myemailId = "jeromelarin@gmail.com"
+var maskid = myemailId.replace(/^(.)(.*)(.@.*)$/,
+(_, a, b, c) => a + b.replace(/./g, '*') + c
+);
+
+console.log(maskid);
 
 module.exports = app

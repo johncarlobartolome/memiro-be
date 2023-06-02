@@ -8,7 +8,6 @@ const { log } = require("console");
 exports.sendVerificationEmail = async (email,token) => {
   //templating html
   const user = await User.findOne({email:email})
-  log(user.emailVerificationToken)
   let verifyHtmlTemplate = fs.readFileSync(
     `${__dirname}/../public/verifyEmailTemplate.html`,
     "utf-8"
