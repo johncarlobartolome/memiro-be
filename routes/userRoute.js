@@ -10,6 +10,6 @@ const {
 
 router.post("/signup", signUp, sendVerificationCode);
 // router.post("/verify", sendVerificationCode);
-router.post("/verify/:code", verifyEmail);
+router.get("/verify/:code", verifyEmail);
 
 module.exports = router;

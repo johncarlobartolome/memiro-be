@@ -19,7 +19,9 @@
         text-align: center;
         margin: auto;
     }
-    #button-verify{
+    #link-verify {
+        display:block;
+        text-decoration: none;
         background-color: #47ac2e;
         border: none;
         color: white;
@@ -27,9 +29,9 @@
         padding: 2%;
         border-radius: .5em;
         font-size: medium;
-        margin: 1em 0;
+        margin: auto;
     }
-    #button-verify:hover{
+    a:hover{
         cursor: pointer;
     }
 </style>
@@ -40,11 +42,11 @@
         <h2>Verify your email address</h2>
         <span>Please confirm that you want to use this as your MEMIRO account email address.</span>
         <br>
-        <button id="button-verify"><a href={{link}}></a>Verify my email</button>
+        {{link "verify email" url}}
         <br>
         <span>Or paste this link into your browser.</span>
         <br>
-        <div><a href="{{link}}">{{link}}</a></div>
+        {{link1 url url}}
     </div>
     
 </body>
