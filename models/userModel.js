@@ -52,16 +52,16 @@ const userSchema = new mongoose.Schema(
       enum: ["active", "inactive", "disabled"],
       default: "active",
     },
-    login_attempt: {
+    loginAttempt: {
       type: Number,
       default: 0,
     },
-    login_disabled_timestamp: { type: Date, timestamp: true },
-    email_verified: {
+    loginDisabledTimestamp: { type: Date},
+    emailVerified: {
       type: Boolean,
       default: false,
     },
-    date_email_verified: {
+    dateEmailVerified: {
       type: Date,
       timestamp: true,
       default:null
